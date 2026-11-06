@@ -192,3 +192,62 @@ Because the source address represented the VirtualBox NAT gateway, banning it co
 Outcome
 
 Successfully demonstrated a security investigation and manual incident response workflow involving detection, analysis, containment, verification, and recovery.
+
+Results and Lessons Learned
+
+Project Results
+
+The SSH threat detection and incident response lab successfully demonstrated the following capabilities:
+
+* Configured and administered an Ubuntu Server virtual machine.
+* Established remote SSH connectivity through VirtualBox NAT port forwarding.
+* Generated controlled authentication failures for security testing.
+* Investigated SSH authentication events using Linux system logs.
+* Identified three matching authentication failures through Fail2ban.
+* Applied and verified a manual IP ban.
+* Removed the ban and confirmed restored SSH connectivity.
+
+Lessons Learned
+
+1. Security logs provide visibility into authentication activity.
+
+Analyzing SSH logs helped identify failed authentication attempts and determine which source address was associated with them.
+
+2. Detection and containment are different security functions.
+
+Fail2ban detected three matching failures, but the configured threshold of five was not reached. Manual containment was therefore tested separately.
+
+3. Network architecture affects security investigations.
+
+VirtualBox NAT translated connections originating from Windows, causing Ubuntu to identify 10.0.2.2 as the source address.
+
+4. Security responses require verification.
+
+The investigation demonstrated the importance of confirming that a ban was applied, checking security logs, removing the restriction, and testing restored access.
+
+5. Recovery is part of incident response.
+
+Restoring legitimate SSH connectivity was an essential final step in the investigation.
+
+Security Improvements and Future Work
+
+Potential improvements to this lab include:
+
+* Testing automatic Fail2ban enforcement after the configured authentication failure threshold.
+* Centralizing authentication logs in a SIEM platform such as Splunk.
+* Creating detection alerts for repeated authentication failures.
+* Comparing legitimate and suspicious SSH activity.
+* Investigating additional Linux authentication events.
+* Expanding the environment to include multiple monitored hosts.
+
+Professional Relevance
+
+This project demonstrates foundational skills applicable to Security Operations Center (SOC) Analyst, Junior Security Analyst, and Incident Response positions.
+
+The investigation involved security event monitoring, authentication log analysis, source IP identification, manual containment, response verification, and recovery.
+
+Final Conclusion
+
+The lab successfully demonstrated a controlled SSH security investigation using Ubuntu Server, OpenSSH, and Fail2ban.
+
+The project strengthened practical understanding of Linux security monitoring, network connectivity, authentication failures, and incident response procedures.
