@@ -128,3 +128,67 @@ Conclusion
 The detection phase confirmed that SSH authentication failures were visible in security logs and that Fail2ban identified matching events.
 
 These findings provided the basis for the subsequent manual containment and recovery tests.
+
+Incident Response and Recovery
+
+Objective
+
+Demonstrate manual containment of a source IP address associated with repeated SSH authentication failures, verify the response through security logs, and safely restore connectivity.
+
+1. Containment
+
+After detecting three matching SSH authentication failures from 10.0.2.2, a manual ban was applied using Fail2ban.
+
+sudo fail2ban-client set sshd banip 10.0.2.2
+
+The command returned 1, indicating that the ban was applied.
+
+2. Containment Verification
+
+The SSH jail status was inspected:
+
+sudo fail2ban-client status sshd
+
+The source address was confirmed on the active banned IP list.
+
+The Fail2ban log was also examined:
+
+sudo grep 'Ban 10.0.2.2' /var/log/fail2ban.log
+
+The log contained a corresponding ban event.
+
+3. Recovery
+
+The IP restriction was manually removed:
+
+sudo fail2ban-client set sshd unbanip 10.0.2.2
+
+The command returned 1, confirming removal of the active ban.
+
+A subsequent status check showed zero currently banned IP addresses.
+
+4. Connectivity Verification
+
+SSH connectivity was tested again from Windows PowerShell:
+
+ssh -p 2222 socanalyst@127.0.0.1
+
+The connection succeeded, confirming that normal remote administration access had been restored.
+
+5. Incident Response Findings
+
+* Authentication failures were detected and attributed to the VirtualBox NAT gateway.
+* Manual containment was successfully applied.
+* The containment action was recorded in Fail2ban logs.
+* The IP restriction was removed successfully.
+* SSH connectivity was restored and verified.
+
+Limitations
+
+This was a controlled lab simulation. The ban was initiated manually rather than automatically triggered by the configured failure threshold.
+
+Because the source address represented the VirtualBox NAT gateway, banning it could affect forwarded SSH connections from the Windows host.
+
+Outcome
+
+Successfully demonstrated a security investigation and manual incident response workflow involving detection, analysis, containment, verification, and recovery.
