@@ -1,4 +1,4 @@
-Project 4: SSH Threat Detection & Incident Response
+by Project 4: SSH Threat Detection & Incident Response
 
 Project Overview
 
@@ -73,4 +73,58 @@ OpenSSH authentication events were examined using the Linux systemd journal.
 
 Fail2ban monitored SSH authentication failures and recorded matching events associated with the NAT gateway address.
 
-The environment was isolated for authorized testing. Because NAT translated host-originated connections to the gateway address, the source IP observed in the Ubuntu logs represented the VirtualBox networking path rather than a distinct external attacker.
+The environment was isolated for authorized  testing. Because NAT translated host-originated connections to the gateway address, the source IP observed in the Ubuntu logs represented the VirtualBox networking path rather than a distinct external attacker.
+
+Threat Detection and Log Analysis
+
+Investigation Objective
+
+The objective was to generate controlled SSH authentication failures, identify the source of the activity, and determine whether the security monitoring system detected the events.
+
+Simulated Authentication Failures
+
+From Windows PowerShell, an SSH connection was attempted using a nonexistent account:
+
+ssh -p 2222 fakeuser@127.0.0.1
+
+The unsuccessful authentication attempts generated events on the Ubuntu Server.
+
+Log Investigation
+
+The following commands were used to investigate SSH activity and Fail2ban detection:
+
+sudo journalctl -u ssh -n 20
+sudo fail2ban-client status sshd
+sudo grep 'Found' /var/log/fail2ban.log | tail -n 10
+
+Evidence Collected
+
+Fail2ban recorded three matching SSH authentication failure events associated with source IP 10.0.2.2.
+
+The logs contained entries matching the following structure:
+
+[sshd] Found 10.0.2.2
+
+The source address was identified as the VirtualBox NAT gateway used by the Windows host to reach the Ubuntu virtual machine.
+
+Detection Findings
+
+* Three SSH authentication failure events were detected.
+* The Fail2ban SSH jail was active.
+* The configured threshold was five failures within 600 seconds.
+* The observed test activity did not trigger an automatic ban.
+* Log correlation successfully linked the matching failures to the NAT gateway address.
+
+Security Analysis
+
+Repeated failed authentication attempts can indicate password guessing, brute-force activity, or misconfigured credentials.
+
+In this investigation, the activity was deliberately generated in an authorized lab environment.
+
+The behavior resembles techniques associated with MITRE ATT&CK T1110 (Brute Force), but no real-world attack or successful compromise occurred.
+
+Conclusion
+
+The detection phase confirmed that SSH authentication failures were visible in security logs and that Fail2ban identified matching events.
+
+These findings provided the basis for the subsequent manual containment and recovery tests.
